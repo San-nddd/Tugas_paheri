@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Turnamen;
 use App\Http\Requests\StoreTurnamenRequest;
 use App\Http\Resources\TurnamenResource;
+use App\Models\Turnamen;
 use App\Traits\ApiResponser;
 
 class TurnamenController extends Controller
@@ -17,13 +17,13 @@ class TurnamenController extends Controller
     {
         try {
             $turnamen = Turnamen::with('penyelenggara')->where('status_turnamen', 'buka')->get();
-            
+
             return $this->successResponse(
-                TurnamenResource::collection($turnamen), 
+                TurnamenResource::collection($turnamen),
                 'Berhasil mengambil daftar turnamen.'
             );
         } catch (\Exception $e) {
-            return $this->errorResponse('Gagal mengambil data: ' . $e->getMessage(), 500);
+            return $this->errorResponse('Gagal mengambil data: '.$e->getMessage(), 500);
         }
     }
 
@@ -31,18 +31,18 @@ class TurnamenController extends Controller
     {
         try {
             $validatedData = $request->validated();
-            $validatedData['id_penyelenggara'] = $request->user()->id_pengguna; 
+            $validatedData['id_penyelenggara'] = $request->user()->id_pengguna;
             $validatedData['status_turnamen'] = 'draf';
 
             $turnamen = Turnamen::create($validatedData);
 
             return $this->successResponse(
-                new TurnamenResource($turnamen), 
-                'Turnamen berhasil dibuat sebagai draf.', 
+                new TurnamenResource($turnamen),
+                'Turnamen berhasil dibuat sebagai draf.',
                 201
             );
         } catch (\Exception $e) {
-            return $this->errorResponse('Gagal membuat turnamen: ' . $e->getMessage(), 500);
+            return $this->errorResponse('Gagal membuat turnamen: '.$e->getMessage(), 500);
         }
     }
 }

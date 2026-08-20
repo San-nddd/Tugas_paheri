@@ -80,7 +80,7 @@ class UpdateSkorRequest extends FormRequest
                 );
             }
 
-            // Validasi tambahan: skor pemenang tidak boleh lebih rendah dari skor lawannya 
+            // Validasi tambahan: skor pemenang tidak boleh lebih rendah dari skor lawannya
             if ($idTimPemenang === $pertandingan->id_tim_1
                 && (int) $this->input('skor_1') < (int) $this->input('skor_2')) {
                 $validator->errors()->add(
@@ -98,7 +98,6 @@ class UpdateSkorRequest extends FormRequest
             }
         });
     }
-
 
     protected function failedValidation(ValidatorContract $validator): void
     {

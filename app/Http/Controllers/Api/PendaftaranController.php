@@ -14,17 +14,16 @@ class PendaftaranController extends Controller
     public function setujui(Request $request, Pendaftaran $pendaftaran)
     {
         try {
-            // Memastikan yang menyetujui adalah penyelenggara dari turnamen tersebut
             $pengguna = $request->user();
-            if ($pendaftaran->turnamen->id_penyelenggara !== $pengguna->id_pengguna && !$pengguna->isAdmin()) {
+            if ($pendaftaran->turnamen->id_penyelenggara !== $pengguna->id_pengguna && ! $pengguna->isAdmin()) {
                 return $this->errorResponse('Anda tidak memiliki hak akses untuk pendaftaran ini.', 403);
             }
 
             $pendaftaran->update(['status_pendaftaran' => 'disetujui']);
 
             return $this->successResponse(null, 'Pendaftaran berhasil disetujui.');
-        } catch (Exception $e) {
-            return $this->errorResponse('Terjadi kesalahan: ' . $e->getMessage(), 500);
+        } catch (\Exception $e) {
+            return $this->errorResponse('Terjadi kesalahan: '.$e->getMessage(), 500);
         }
     }
 
@@ -32,20 +31,20 @@ class PendaftaranController extends Controller
     {
         try {
             $request->validate(['keterangan_penolakan' => 'required|string|max:255']);
-            
+
             $pengguna = $request->user();
-            if ($pendaftaran->turnamen->id_penyelenggara !== $pengguna->id_pengguna && !$pengguna->isAdmin()) {
+            if ($pendaftaran->turnamen->id_penyelenggara !== $pengguna->id_pengguna && ! $pengguna->isAdmin()) {
                 return $this->errorResponse('Anda tidak memiliki hak akses untuk pendaftaran ini.', 403);
             }
 
             $pendaftaran->update([
                 'status_pendaftaran' => 'ditolak',
-                'keterangan_penolakan' => $request->keterangan_penolakan
+                'keterangan_penolakan' => $request->keterangan_penolakan,
             ]);
 
             return $this->successResponse(null, 'Pendaftaran ditolak.');
         } catch (\Exception $e) {
-            return $this->errorResponse('Terjadi kesalahan: ' . $e->getMessage(), 500);
+            return $this->errorResponse('Terjadi kesalahan: '.$e->getMessage(), 500);
         }
     }
 }

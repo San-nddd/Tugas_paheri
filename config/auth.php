@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Pengguna;
 use App\Models\User;
 
 return [
@@ -63,10 +64,10 @@ return [
 
     // config/auth.php
     'providers' => [
-    'users' => [
-        'driver' => 'eloquent',
-        'model'  => App\Models\Pengguna::class, // <-- Pastikan mengarah ke Pengguna
-    ],
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => Pengguna::class, // <-- Pastikan mengarah ke Pengguna
+        ],
     ],
 
     /*

@@ -7,13 +7,17 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         // -----------------------------------------------------------------
         // 1. SQL VIEW: v_jadwal_publik
         // Menggabungkan pertandingan + turnamen + tim (tim_1 & tim_2)
         // untuk endpoint jadwal publik (tanpa perlu N+1 query di aplikasi).
         // -----------------------------------------------------------------
         DB::unprepared('DROP VIEW IF EXISTS v_jadwal_publik');
-        DB::unprepared("
+        DB::unprepared('
             CREATE VIEW v_jadwal_publik AS
             SELECT
                 p.id_pertandingan,
@@ -35,7 +39,7 @@ return new class extends Migration
             LEFT JOIN tim tim1      ON tim1.id_tim = p.id_tim_1 AND tim1.deleted_at IS NULL
             LEFT JOIN tim tim2      ON tim2.id_tim = p.id_tim_2 AND tim2.deleted_at IS NULL
             LEFT JOIN tim timw      ON timw.id_tim = p.id_tim_pemenang AND timw.deleted_at IS NULL
-        ");
+        ');
 
         // -----------------------------------------------------------------
         // 2. TRIGGER: after_pendaftaran_update

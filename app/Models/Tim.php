@@ -13,6 +13,7 @@ class Tim extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'tim';
+
     protected $primaryKey = 'id_tim';
 
     protected $fillable = [

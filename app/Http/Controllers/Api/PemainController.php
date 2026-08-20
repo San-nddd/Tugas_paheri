@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Api; // Menggunakan huruf A kapital
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pemain;
+use App\Models\Tim;
 use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -12,15 +13,11 @@ class PemainController extends Controller
 {
     use ApiResponser;
 
-    /**
-     * Menampilkan daftar pemain (Bisa difilter berdasarkan ID Tim).
-     */
     public function index(Request $request)
     {
         try {
             $query = Pemain::query();
 
-            // Opsional: Jika ingin menampilkan pemain dari tim tertentu saja (?id_tim=1)
             if ($request->has('id_tim')) {
                 $query->where('id_tim', $request->id_tim);
             }
@@ -29,80 +26,87 @@ class PemainController extends Controller
 
             return $this->successResponse($pemain, 'Berhasil mengambil daftar pemain.');
         } catch (\Exception $e) {
-            return $this->errorResponse('Gagal mengambil data pemain: ' . $e->getMessage(), 500);
+            return $this->errorResponse('Gagal mengambil data pemain: '.$e->getMessage(), 500);
         }
     }
 
-    /**
-     * Menambahkan pemain baru ke dalam tim.
-     */
     public function store(Request $request)
     {
         try {
-            // Sesuaikan nama field ('nama_pemain', 'nickname', dll) dengan kolom di tabel databasemu
             $validated = $request->validate([
-                'id_tim'      => ['required', 'exists:tim,id'], 
-                'nama_pemain' => ['required', 'string', 'max:255'],
-                'nickname'    => ['nullable', 'string', 'max:255'],
-                'posisi'      => ['nullable', 'string', 'max:100'],
+                'id_tim' => ['required', 'exists:tim,id_tim'],
+                'nama_game' => ['required', 'string', 'max:50'],
+                'id_mlbb' => ['required', 'string', 'max:30'],
+                'id_server' => ['required', 'string', 'max:20'],
             ]);
+
+            $pengguna = $request->user();
+            $tim = Tim::findOrFail($validated['id_tim']);
+
+            if ($tim->id_kapten !== $pengguna->id_pengguna && ! $pengguna->isAdmin()) {
+                return $this->errorResponse('Anda tidak memiliki hak akses untuk menambahkan pemain ke tim ini.', 403);
+            }
 
             $pemain = Pemain::create($validated);
 
             return $this->successResponse($pemain, 'Pemain berhasil ditambahkan ke dalam tim.', 201);
-            
         } catch (ValidationException $e) {
-            return $this->errorResponse($e->errors(), 422);
+            return $this->errorResponse('Validasi gagal.', 422, $e->errors());
         } catch (\Exception $e) {
-            return $this->errorResponse('Gagal menambahkan pemain: ' . $e->getMessage(), 500);
+            return $this->errorResponse('Gagal menambahkan pemain: '.$e->getMessage(), 500);
         }
     }
 
-    /**
-     * Menampilkan detail satu pemain.
-     */
     public function show(Pemain $pemain)
     {
         try {
             return $this->successResponse($pemain, 'Detail pemain berhasil dimuat.');
         } catch (\Exception $e) {
-            return $this->errorResponse('Terjadi kesalahan: ' . $e->getMessage(), 500);
+            return $this->errorResponse('Terjadi kesalahan: '.$e->getMessage(), 500);
         }
     }
 
-    /**
-     * Memperbarui data pemain.
-     */
     public function update(Request $request, Pemain $pemain)
     {
         try {
+            $pengguna = $request->user();
+            $tim = $pemain->tim;
+
+            if ($tim->id_kapten !== $pengguna->id_pengguna && ! $pengguna->isAdmin()) {
+                return $this->errorResponse('Anda tidak memiliki hak akses untuk mengubah pemain ini.', 403);
+            }
+
             $validated = $request->validate([
-                'nama_pemain' => ['sometimes', 'required', 'string', 'max:255'],
-                'nickname'    => ['nullable', 'string', 'max:255'],
-                'posisi'      => ['nullable', 'string', 'max:100'],
+                'nama_game' => ['sometimes', 'required', 'string', 'max:50'],
+                'id_mlbb' => ['sometimes', 'required', 'string', 'max:30'],
+                'id_server' => ['sometimes', 'required', 'string', 'max:20'],
             ]);
 
             $pemain->update($validated);
 
             return $this->successResponse($pemain, 'Data pemain berhasil diperbarui.');
-            
         } catch (ValidationException $e) {
-            return $this->errorResponse($e->errors(), 422);
+            return $this->errorResponse('Validasi gagal.', 422, $e->errors());
         } catch (\Exception $e) {
-            return $this->errorResponse('Gagal memperbarui pemain: ' . $e->getMessage(), 500);
+            return $this->errorResponse('Gagal memperbarui pemain: '.$e->getMessage(), 500);
         }
     }
 
-    /**
-     * Menghapus pemain dari tim (Kick).
-     */
-    public function destroy(Pemain $pemain)
+    public function destroy(Request $request, Pemain $pemain)
     {
         try {
+            $pengguna = $request->user();
+            $tim = $pemain->tim;
+
+            if ($tim->id_kapten !== $pengguna->id_pengguna && ! $pengguna->isAdmin()) {
+                return $this->errorResponse('Anda tidak memiliki hak akses untuk menghapus pemain ini.', 403);
+            }
+
             $pemain->delete();
+
             return $this->successResponse(null, 'Pemain berhasil dihapus dari tim.');
         } catch (\Exception $e) {
-            return $this->errorResponse('Gagal menghapus pemain: ' . $e->getMessage(), 500);
+            return $this->errorResponse('Gagal menghapus pemain: '.$e->getMessage(), 500);
         }
     }
 }

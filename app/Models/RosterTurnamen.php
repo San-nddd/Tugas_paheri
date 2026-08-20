@@ -11,6 +11,7 @@ class RosterTurnamen extends Model
     use HasFactory;
 
     protected $table = 'roster_turnamen';
+
     protected $primaryKey = 'id_roster';
 
     protected $fillable = [

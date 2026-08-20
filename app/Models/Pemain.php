@@ -12,6 +12,7 @@ class Pemain extends Model
     use HasFactory;
 
     protected $table = 'pemain';
+
     protected $primaryKey = 'id_pemain';
 
     protected $fillable = [

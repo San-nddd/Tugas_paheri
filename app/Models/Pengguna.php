@@ -13,6 +13,7 @@ class Pengguna extends Authenticatable
     use HasApiTokens, HasFactory, SoftDeletes;
 
     protected $table = 'pengguna';
+
     protected $primaryKey = 'id_pengguna';
 
     protected $fillable = [

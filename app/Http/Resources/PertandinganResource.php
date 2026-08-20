@@ -7,11 +7,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PertandinganResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
@@ -20,11 +15,11 @@ class PertandinganResource extends JsonResource
             'babak' => $this->babak,
             'tim_1' => [
                 'id_tim' => $this->id_tim_1,
-                'nama_tim' => $this->whenLoaded('tim1', fn () => $this->tim1?->nama_tim),
+                'nama_tim' => $this->whenLoaded('timSatu', fn () => $this->timSatu?->nama_tim),
             ],
             'tim_2' => [
                 'id_tim' => $this->id_tim_2,
-                'nama_tim' => $this->whenLoaded('tim2', fn () => $this->tim2?->nama_tim),
+                'nama_tim' => $this->whenLoaded('timDua', fn () => $this->timDua?->nama_tim),
             ],
             'skor_1' => $this->skor_1,
             'skor_2' => $this->skor_2,
@@ -37,14 +32,6 @@ class PertandinganResource extends JsonResource
             'next_match_id' => $this->next_match_id,
             'dibuat_pada' => $this->created_at?->toIso8601String(),
             'diperbarui_pada' => $this->updated_at?->toIso8601String(),
-        ];
-    }
-
-    
-    public function with(Request $request): array
-    {
-        return [
-            'status' => 'success',
         ];
     }
 }

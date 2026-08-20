@@ -11,6 +11,7 @@ class Pertandingan extends Model
     use HasFactory;
 
     protected $table = 'pertandingan';
+
     protected $primaryKey = 'id_pertandingan';
 
     protected $fillable = [

@@ -12,6 +12,7 @@ class Turnamen extends Model
     use HasFactory;
 
     protected $table = 'turnamen';
+
     protected $primaryKey = 'id_turnamen';
 
     protected $fillable = [
@@ -26,9 +27,9 @@ class Turnamen extends Model
     ];
 
     protected $casts = [
-        'tanggal'         => 'date',
-        'biaya'           => 'decimal:2',
-        'kuota_maksimal'  => 'integer',
+        'tanggal' => 'date',
+        'biaya' => 'decimal:2',
+        'kuota_maksimal' => 'integer',
     ];
 
     public function penyelenggara(): BelongsTo
